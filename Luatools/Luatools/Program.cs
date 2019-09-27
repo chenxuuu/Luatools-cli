@@ -1,4 +1,5 @@
-﻿using System;
+using System.IO.Ports;
+using System;
 
 namespace Luatools
 {
@@ -6,7 +7,10 @@ namespace Luatools
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            foreach(string p in SerialPort.GetPortNames())
+            {
+                Console.WriteLine(p);
+            }
         }
     }
 }
