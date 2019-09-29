@@ -1,5 +1,6 @@
 using System.IO.Ports;
 using System;
+using NLua;
 
 namespace Luatools
 {
@@ -11,6 +12,12 @@ namespace Luatools
             {
                 Console.WriteLine(p);
             }
+
+            
+            Lua state = new Lua();
+            Console.WriteLine(state.DoString("return 123")[0]);
+
+            Console.ReadLine();
         }
     }
 }
