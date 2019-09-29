@@ -13,6 +13,12 @@ namespace Luatools
                 Console.WriteLine(p);
             }
 
+            var uart = new Models.Uart();
+            uart.DataReceived += (o, d) =>
+            {
+
+            };
+
             
             Lua state = new Lua();
             Console.WriteLine(state.DoString("return 123")[0]);
