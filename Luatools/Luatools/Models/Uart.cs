@@ -13,7 +13,7 @@ namespace Luatools.Models
         public event EventHandler<byte[]> UartDataSent;
 
         //延时
-        public int Dalay { get; set; } = 50;
+        public int Delay { get; set; } = 50;
 
         /// <summary>
         /// 初始化串口各个触发函数
@@ -39,7 +39,7 @@ namespace Luatools.Models
         //接收到事件
         private void Serial_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            Task.Delay(Dalay).Wait();//等待时间
+            Task.Delay(Delay).Wait();//等待时间
             if (!serial.IsOpen)//串口被关了，不读了
                 return;
             int length = ((SerialPort)sender).BytesToRead;
