@@ -22,6 +22,14 @@ namespace Luatools.Models
         {
             //声明接收到事件
             serial.DataReceived += Serial_DataReceived;
+            //serial.BreakState = false;
+            serial.DataBits = 8;
+            //serial.DtrEnable = false;
+            serial.Parity = Parity.None;
+            //serial.RtsEnable = false;
+            serial.StopBits = StopBits.One;
+            serial.ReceivedBytesThreshold = 1;
+            serial.ReadTimeout = 10;
         }
 
         /// <summary>

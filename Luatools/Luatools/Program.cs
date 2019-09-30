@@ -25,7 +25,7 @@ namespace Luatools
             }
             else if(SerialPort.GetPortNames().Length == 1)//一个串口
             {
-                uart.serial.PortName = SerialPort.GetPortNames()[1];
+                uart.serial.PortName = SerialPort.GetPortNames()[0];
             }
             else
             {
@@ -60,6 +60,7 @@ namespace Luatools
 
             uart.DataReceived += (o, d) =>
             {
+                //Console.WriteLine($"[debug]data receive: {BitConverter.ToString(d)}");
                 foreach (byte[] b in Tools.Host.Decode(d))
                 {
                     if (b.Length > 0 && b[0] == 0x80)
@@ -77,14 +78,19 @@ namespace Luatools
                 sendCount(uart);
             };
 
+            uart.UartDataSent += (o,d) =>
+            {
+                //Console.WriteLine($"[debug]data sent");
+            };
+
             //获取日志
             Task.Run(() =>
             {
                 while(true)
                 {
-                    Task.Delay(100).Wait();
-                    //uart.SendData(Tools.Host.Encode(0x86, new byte[] { 0, 1, 8, 0, 0x8f }));
-                    sendCount(uart);
+                    Task.Delay(500).Wait();
+                    uart.SendData(Tools.Host.Encode(0x86, new byte[] { 0, 1, 8, 0, 0x8f }));
+                    //sendCount(uart);
                 }
             });
 
