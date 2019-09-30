@@ -9,20 +9,43 @@ namespace Luatools
 {
     class Program
     {
+        private static uint count = 1;
         static void Main(string[] args)
         {
-
             var uart = new Models.Uart()
             {
                 Delay = 10,
             };
             uart.serial.BaudRate = 921600;
-            foreach (string p in SerialPort.GetPortNames())
+            
+            if(SerialPort.GetPortNames().Length == 0)//没串口
             {
-                Console.WriteLine($"find port {p}");
-                uart.serial.PortName = p;
-                break;
+                Console.WriteLine($"no port");
+                return;
             }
+            else if(SerialPort.GetPortNames().Length == 1)//一个串口
+            {
+                uart.serial.PortName = SerialPort.GetPortNames()[1];
+            }
+            else
+            {
+                Console.WriteLine($"found ports:");
+                for (int i = 0; i < SerialPort.GetPortNames().Length; i++)
+                    Console.WriteLine($"{i}.\t{SerialPort.GetPortNames()[i]}");
+                Console.Write($"please select your port(type number):");
+                string port = Console.ReadLine();
+                try
+                {
+                    int porti = int.Parse(port);
+                    uart.serial.PortName = SerialPort.GetPortNames()[porti];
+                }
+                catch
+                {
+                    Console.Write($"number not right, exit");
+                    return;
+                }
+            }
+
             try
             {
                 uart.Init();
@@ -35,7 +58,6 @@ namespace Luatools
                 return;
             }
 
-            int count = 1;
             uart.DataReceived += (o, d) =>
             {
                 foreach (byte[] b in Tools.Host.Decode(d))
@@ -52,15 +74,7 @@ namespace Luatools
                         }
                     }
                 }
-                uart.SendData(Tools.Host.Encode(0xff, new byte[] { 
-                    4,
-                    3,
-                    (byte)(count / 256 / 256 / 256 % 256),
-                    (byte)(count / 256/256 % 256),
-                    (byte)(count/256 % 256),
-                    (byte)(count%256)
-                }));
-                count++;
+                sendCount(uart);
             };
 
             //获取日志
@@ -69,7 +83,8 @@ namespace Luatools
                 while(true)
                 {
                     Task.Delay(100).Wait();
-                    uart.SendData(Tools.Host.Encode(0x86, new byte[] { 0, 1, 8, 0, 0x8f }));
+                    //uart.SendData(Tools.Host.Encode(0x86, new byte[] { 0, 1, 8, 0, 0x8f }));
+                    sendCount(uart);
                 }
             });
 
@@ -83,7 +98,20 @@ namespace Luatools
         }
 
 
-
+        public static void sendCount(Models.Uart uart)
+        {
+            uart.SendData(Tools.Host.Encode(0xff, new byte[] {
+                    4,
+                    3,
+                    (byte)(count / 256 / 256 / 256 % 256),
+                    (byte)(count / 256/256 % 256),
+                    (byte)(count/256 % 256),
+                    (byte)(count%256)
+                }));
+            count++;
+            if (count >= 256 * 256 * 256)
+                count = 1;
+        }
 
 
         /// <summary>
